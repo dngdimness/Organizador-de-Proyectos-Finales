@@ -1,0 +1,1 @@
+"# Organizador-de-Proyectos-Finales"  initgit add README.mdgit commit -m "first commit"git branch -M maingit remote add origin https://github.com/dngdimness/Organizador-de-Proyectos-Finales.gitgit push -u origin main
