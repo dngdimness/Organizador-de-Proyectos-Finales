@@ -25,6 +25,8 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner@2.0.3';
 import { Toaster } from './components/ui/sonner';
+import uchColorSvg from './uch-color.svg';
+import uchBlancaSvg from './uch-blanca.svg';
 
 const STORAGE_KEY = 'design-project';
 
@@ -39,6 +41,8 @@ export default function App() {
   const [showMobileDropArea, setShowMobileDropArea] = useState(false);
   const [isMobileDropActive, setIsMobileDropActive] = useState(false);
   const [invalidItemIds, setInvalidItemIds] = useState<string[]>([]);
+  const [showSplash, setShowSplash] = useState(true);
+  const [logoSrc, setLogoSrc] = useState(uchColorSvg);
 
   // Calcular puntaje basado en categorías cubiertas
   const { totalScore, coveredCategories, categoryValue, coveragePercentage } = calculateCategoryScore(
@@ -69,6 +73,42 @@ export default function App() {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
     }
   }, [projectItems]);
+
+  // Splash screen y logo dinámico
+  useEffect(() => {
+    // Splash screen timer
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 1200);
+
+    // Logo dinámico basado en tema de la app
+    const updateLogo = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setLogoSrc(isDark ? uchBlancaSvg : uchColorSvg);
+    };
+
+    // Actualizar logo inicialmente
+    updateLogo();
+
+    // Observar cambios en la clase "dark" del documento
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          updateLogo();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    });
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, []);
 
   // Agregar a historial
   const addToHistory = (newItems: ProjectItemType[]) => {
@@ -315,14 +355,48 @@ export default function App() {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       <Toaster position="top-center" />
       
+      {/* Splash Screen */}
+      {showSplash && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-900">
+          <style>{`
+            @keyframes splashScale {
+              0% {
+                transform: scale(0.6);
+                opacity: 0;
+              }
+              80% {
+                transform: scale(1.05);
+                opacity: 1;
+              }
+              95% {
+                transform: scale(1.2);
+              }
+              100% {
+                transform: scale(1);
+              }
+            }
+            .splash-logo {
+              animation: splashScale 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+            }
+          `}</style>
+          <img 
+            src={uchColorSvg} 
+            alt="Logo UCH" 
+            className="splash-logo w-32 h-32"
+          />
+        </div>
+      )}
+      
       {/* Header */}
       <header className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b dark:border-gray-700 sticky top-0 z-10">
         <div className="max-w-screen-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
+              <img 
+                src={logoSrc} 
+                alt="Logo UCH" 
+                className="w-10 h-10 object-contain"
+              />
               <div>
                 <h1 className="text-xl">Organizador de Proyectos Finales</h1>
                 <p className="text-sm text-muted-foreground">Licenciatura en Diseño</p>

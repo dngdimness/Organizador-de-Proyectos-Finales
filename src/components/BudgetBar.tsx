@@ -30,14 +30,14 @@ BudgetButton.displayName = 'BudgetButton';
 export function BudgetBar({ totalScore, coveredCategoriesCount, totalCategoriesCount, categoryValue }: BudgetBarProps) {
   const [showBudgetDetails, setShowBudgetDetails] = useState(false);
   const percentage = totalScore;
-  const isComplete = coveredCategoriesCount === totalCategoriesCount;
+  const isComplete = coveredCategoriesCount >= 8;
 
   return (
     <div className="space-y-3">
       {/* Instrucciones visibles */}
       <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-3">
         <p className="text-sm text-blue-900 dark:text-blue-100">
-          💡 <strong>Instrucción:</strong> Elegí como mínimo un componente de cada categoría. Podés agregar más componentes si lo necesitás.
+          💡 <strong>Instrucción:</strong> Elegí como mínimo 8 categorías (pueden ser 8 base o 7 base + 1 personalizada). Podés agregar más componentes si lo necesitás.
         </p>
       </div>
 
@@ -113,7 +113,7 @@ export function BudgetBar({ totalScore, coveredCategoriesCount, totalCategoriesC
         <Alert className="border-yellow-200 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-950">
           <AlertCircle className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
           <AlertDescription className="text-yellow-800 dark:text-yellow-200">
-            Te faltan {totalCategoriesCount - coveredCategoriesCount} {totalCategoriesCount - coveredCategoriesCount === 1 ? 'categoría' : 'categorías'} por cubrir para alcanzar los 100 puntos.
+            Necesitás cubrir mínimo 8 categorías para alcanzar los 100 puntos. Te faltan {8 - coveredCategoriesCount} {8 - coveredCategoriesCount === 1 ? 'categoría' : 'categorías'}.
           </AlertDescription>
         </Alert>
       )}

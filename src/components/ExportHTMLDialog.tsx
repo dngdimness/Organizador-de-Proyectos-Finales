@@ -41,8 +41,9 @@ export function ExportHTMLDialog({
     const errors: string[] = [];
 
     if (!categoryValidation.isValid) {
+      const missingCount = 8 - categoryValidation.coveredCount;
       const missingNames = categoryValidation.missingCategories.map(c => c.name).join(', ');
-      errors.push(`Debes elegir al menos un componente en cada categoría. Faltan componentes en: ${missingNames}`);
+      errors.push(`Debes cubrir al menos 8 categorías. Te faltan ${missingCount} ${missingCount === 1 ? 'categoría' : 'categorías'}. Faltantes: ${missingNames}`);
     }
 
     if (!justificationValidation.isValid) {
@@ -188,6 +189,7 @@ function generateHTMLContent(
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="/uch-color.svg" />
   <title>Proyecto Final - ${studentName}</title>
   <style>
     * {
@@ -200,6 +202,15 @@ function generateHTMLContent(
       * {
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
+      }
+      
+      .category-section {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      
+      .pdf-button {
+        display: none;
       }
     }
     
@@ -342,6 +353,48 @@ function generateHTMLContent(
       line-height: 1.6;
     }
     
+    .docente-validacion {
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 1px solid #ddd;
+    }
+
+    .docente-validacion label {
+      display: block;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    .firmas {
+      display: grid;
+      grid-template-columns: repeat(5, auto);
+      gap: 8px;
+      align-items: center;
+    }
+
+    .firmas div {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .firmas span {
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+
+    .firma-box {
+      width: 100%;
+      height: 50px;
+      border: 1px solid #000;
+      background: #fff;
+    }
+    
     .footer {
       margin-top: 60px; 
       padding-top: 24px; 
@@ -349,6 +402,33 @@ function generateHTMLContent(
       text-align: center; 
       color: #666666; 
       font-size: 13px;
+    }
+    
+    .pdf-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #6B46C1;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: all 0.2s;
+      z-index: 1000;
+    }
+    
+    .pdf-button:hover {
+      background: #5a3ba0;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .pdf-button:active {
+      transform: translateY(0);
     }
     
     @media print {
@@ -374,6 +454,8 @@ function generateHTMLContent(
   </style>
 </head>
 <body>
+  <button class="pdf-button" onclick="window.print()">📥 Descargar PDF</button>
+  
   <div class="header">
     <h1>Proyecto Final de Licenciatura en Diseño</h1>
     <div class="meta">
@@ -434,6 +516,21 @@ function generateHTMLContent(
                   ${item.justification}
                 </div>
               ` : ''}
+              <div class="docente-validacion">
+                <label>Seguimiento docente:</label>
+                <div class="firmas">
+                  <div><span>1</span><div class="firma-box"></div></div>
+                  <div><span>2</span><div class="firma-box"></div></div>
+                  <div><span>3</span><div class="firma-box"></div></div>
+                  <div><span>4</span><div class="firma-box"></div></div>
+                  <div><span>5</span><div class="firma-box"></div></div>
+                  <div><span>6</span><div class="firma-box"></div></div>
+                  <div><span>7</span><div class="firma-box"></div></div>
+                  <div><span>8</span><div class="firma-box"></div></div>
+                  <div><span>9</span><div class="firma-box"></div></div>
+                  <div><span>10</span><div class="firma-box"></div></div>
+                </div>
+              </div>
             </div>
           `;
         }).join('')}

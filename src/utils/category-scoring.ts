@@ -1,8 +1,14 @@
 import { ProjectItem, Component, Category } from '../types';
 
+// Constantes del sistema
+const TOTAL_CATEGORIES = 9; // 8 base + 1 personalizada
+const MIN_CATEGORIES_REQUIRED = 8;
+const CATEGORY_VALUE = 12.5; // 100 / 8 = 12.5 puntos por categoría
+const TOTAL_POINTS = 100;
+
 /**
  * Calcula el puntaje total basado en categorías cubiertas
- * Cada categoría vale 100 / total_categorías
+ * Cada categoría vale 12.5 puntos
  * Solo cuenta si tiene al menos un componente
  */
 export function calculateCategoryScore(
@@ -15,7 +21,6 @@ export function calculateCategoryScore(
   categoryValue: number;
   coveragePercentage: number;
 } {
-  const categoryValue = 100 / categories.length;
   const coveredCategories = new Set<string>();
 
   // Identificar qué categorías tienen al menos un componente
@@ -26,21 +31,21 @@ export function calculateCategoryScore(
     }
   });
 
-  const totalScore = coveredCategories.size * categoryValue;
-  const coveragePercentage = (coveredCategories.size / categories.length) * 100;
+  // Cada categoría cubierta vale 12.5 puntos
+  const totalScore = coveredCategories.size * CATEGORY_VALUE;
+  const coveragePercentage = (coveredCategories.size / MIN_CATEGORIES_REQUIRED) * 100;
 
   return {
     totalScore,
     coveredCategories,
-    categoryValue,
+    categoryValue: CATEGORY_VALUE,
     coveragePercentage,
   };
 }
 
 /**
  * Verifica si el proyecto cumple con los requisitos mínimos para exportar
- * Debe tener al menos un componente por categoría
- * Excepción: puede faltar una categoría si usa componente personalizado
+ * Debe tener al menos 8 categorías cubiertas (puede ser 8 base o 7 base + 1 personalizada)
  */
 export function validateProjectForExport(
   projectItems: ProjectItem[],
@@ -50,6 +55,7 @@ export function validateProjectForExport(
   isValid: boolean;
   missingCategories: Category[];
   hasCustomComponent: boolean;
+  coveredCount: number;
 } {
   const coveredCategories = new Set<string>();
   let hasCustomComponent = false;
@@ -68,15 +74,14 @@ export function validateProjectForExport(
     (cat) => !coveredCategories.has(cat.id)
   );
 
-  // Si usa componente personalizado, puede faltar una categoría
-  const isValid = hasCustomComponent
-    ? missingCategories.length <= 1
-    : missingCategories.length === 0;
+  // Debe tener mínimo 8 categorías cubiertas
+  const isValid = coveredCategories.size >= MIN_CATEGORIES_REQUIRED;
 
   return {
     isValid,
     missingCategories,
     hasCustomComponent,
+    coveredCount: coveredCategories.size,
   };
 }
 
@@ -120,3 +125,5 @@ export function validateJustifications(
     invalidItems,
   };
 }
+
+export { MIN_CATEGORIES_REQUIRED, CATEGORY_VALUE, TOTAL_POINTS };

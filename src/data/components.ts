@@ -76,14 +76,6 @@ export const components: Component[] = [
     icon: 'Layers' 
   },
   { 
-    id: 'motion-identity', 
-    name: 'Motion identity (marca animada)', 
-    description: 'Identidad visual en movimiento', 
-    basePoints: 0, 
-    categoryId: 'identity-system', 
-    icon: 'Sparkles' 
-  },
-  { 
     id: 'iconography', 
     name: 'Iconografía / pictograma / señalética', 
     description: 'Sistema de íconos y pictogramas personalizados', 
@@ -140,30 +132,6 @@ export const components: Component[] = [
     basePoints: 0, 
     categoryId: 'digital-experiences', 
     icon: 'ShoppingCart' 
-  },
-  { 
-    id: 'clickable-prototype', 
-    name: 'Prototipo clickable', 
-    description: 'Prototipo funcional navegable', 
-    basePoints: 0, 
-    categoryId: 'digital-experiences', 
-    icon: 'Pointer' 
-  },
-  { 
-    id: 'microinteractions', 
-    name: 'Microinteracciones', 
-    description: 'Detalles de interacción en UI', 
-    basePoints: 0, 
-    categoryId: 'digital-experiences', 
-    icon: 'Sparkle' 
-  },
-  { 
-    id: 'gamified-experience', 
-    name: 'Gamificación de la experiencia', 
-    description: 'Mecánicas de juego en interfaces digitales', 
-    basePoints: 0, 
-    categoryId: 'digital-experiences', 
-    icon: 'Star' 
   },
 
   // 🌐 Contenidos digitales y comunidad
@@ -310,14 +278,6 @@ export const components: Component[] = [
     icon: 'Network' 
   },
   { 
-    id: 'packaging-qr-ar', 
-    name: 'Packaging + QR / AR', 
-    description: 'Empaque con experiencia digital aumentada', 
-    basePoints: 0, 
-    categoryId: 'playful-transmedia', 
-    icon: 'PackageSearch' 
-  },
-  { 
     id: 'hybrid-experience', 
     name: 'Experiencia híbrida físico-digital', 
     description: 'Vivencia que integra mundo real y digital', 
@@ -392,6 +352,14 @@ export const components: Component[] = [
     basePoints: 0, 
     categoryId: 'experimental-tech', 
     icon: 'Zap' 
+  },
+  { 
+    id: 'artificial-intelligence', 
+    name: 'Inteligencia artificial', 
+    description: 'Sistemas y aplicaciones basadas en IA', 
+    basePoints: 0, 
+    categoryId: 'experimental-tech', 
+    icon: 'Brain' 
   },
   { 
     id: 'blockchain', 

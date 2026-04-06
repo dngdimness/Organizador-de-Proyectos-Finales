@@ -25,16 +25,19 @@ export function AboutDialog({ open, onOpenChange }: AboutDialogProps) {
         <div className="space-y-4">
           <div>
             <p className="text-sm text-muted-foreground mb-2">
-              Herramienta para organizar y presupuestar proyectos finales de licenciatura en diseño.
+              Herramienta para organizar, estructurar y fundamentar proyectos finales de licenciatura en diseño.
             </p>
             <p className="text-sm text-muted-foreground">
-              Sistema de puntos con presupuesto inicial de 100 puntos, descuentos por repetición y funcionalidades de exportación.
+              Sistema de validación por componentes con un total de 100 puntos distribuidos por categorías.
             </p>
           </div>
           
           <div className="border-t pt-4">
             <p className="text-sm font-medium mb-2">Diseñado por</p>
             <p className="text-sm mb-2">Nicolás Santangelo</p>
+            <p className="text-sm text-muted-foreground mb-2">
+              Agradecimientos a Pablo Pineda y Alejandra Guinta por sus ideas y aportes.
+            </p>
             <a
               href="https://nicosantangelo.ar/links/"
               target="_blank"
