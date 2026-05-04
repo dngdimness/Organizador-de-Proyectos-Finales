@@ -7,7 +7,6 @@ import { CategorySection } from './components/CategorySection';
 import { ProjectItem } from './components/ProjectItem';
 import { ExportHTMLDialog } from './components/ExportHTMLDialog';
 import { ThemeToggle } from './components/ThemeToggle';
-import { MobileDropArea } from './components/MobileDropArea';
 import { AboutDialog } from './components/AboutDialog';
 import { Button } from './components/ui/button';
 import { Input } from './components/ui/input';
@@ -40,12 +39,9 @@ export default function App() {
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showAboutDialog, setShowAboutDialog] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
-  const [showMobileDropArea, setShowMobileDropArea] = useState(false);
-  const [isMobileDropActive, setIsMobileDropActive] = useState(false);
   const [invalidItemIds, setInvalidItemIds] = useState<string[]>([]);
   const [showSplash, setShowSplash] = useState(true);
   const [logoSrc, setLogoSrc] = useState(uchColorSvg);
-  const [touchY, setTouchY] = useState<number | null>(null);
 
   // Calcular puntaje basado en categorías cubiertas
   const { totalScore, coveredCategories, categoryValue, coveragePercentage } = calculateCategoryScore(
@@ -120,29 +116,11 @@ export default function App() {
       attributeFilter: ['class']
     });
 
-    // Detectar posición táctil para MobileDropArea
-    const handleTouchMove = (e: TouchEvent) => {
-      if (draggingComponent && showMobileDropArea) {
-        const touch = e.touches[0];
-        const y = touch.clientY;
-        setTouchY(y);
-        
-        // Detectar si está en el área de drop (últimos 30vh)
-        const windowHeight = window.innerHeight;
-        const dropAreaThreshold = windowHeight * 0.7; // 30% desde abajo
-        
-        setIsMobileDropActive(y > dropAreaThreshold);
-      }
-    };
-
-    document.addEventListener('touchmove', handleTouchMove, { passive: true });
-
     return () => {
       clearTimeout(timer);
       observer.disconnect();
-      document.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [draggingComponent, showMobileDropArea]);
+  }, []);
 
   // Agregar a historial
   const addToHistory = (newItems: ProjectItemType[]) => {
@@ -171,21 +149,14 @@ export default function App() {
     }
   };
 
-  // Drag handlers
+  // Drag handlers (solo desktop)
   const handleDragStart = (component: Component) => {
     setDraggingComponent(component);
-    
-    const isMobile = window.innerWidth < 1024;
-    if (isMobile) {
-      setShowMobileDropArea(true);
-    }
   };
 
   const handleDragEnd = () => {
     setDraggingComponent(null);
     setIsDragOver(false);
-    setShowMobileDropArea(false);
-    setIsMobileDropActive(false);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -248,31 +219,13 @@ export default function App() {
     setDraggingComponent(null);
   };
   
-  // Mobile drop area handlers
-  const handleMobileDropAreaDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsMobileDropActive(true);
-  };
-  
-  const handleMobileDropAreaDragLeave = () => {
-    setIsMobileDropActive(false);
-  };
-  
-  const handleMobileDropAreaDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsMobileDropActive(false);
-    setShowMobileDropArea(false);
-    
-    const componentId = e.dataTransfer.getData('componentId');
-    const component = components.find((c) => c.id === componentId);
-    
-    if (!component) return;
-
+  // Handler para agregar componentes con clic/tap (móvil)
+  const handleComponentClick = (component: Component) => {
     // Para componentes personalizados, siempre crear uno nuevo
     if (component.id === 'custom-component') {
       const newItem: ProjectItemType = {
-        id: `${componentId}-${Date.now()}`,
-        componentId,
+        id: `${component.id}-${Date.now()}`,
+        componentId: component.id,
         quantity: 1,
         justification: '',
         customName: 'Componente personalizado'
@@ -280,32 +233,27 @@ export default function App() {
       const newItems = [...projectItems, newItem];
       setProjectItems(newItems);
       addToHistory(newItems);
-      toast.success(`\"${component.name}\" añadido al proyecto`);
-      setDraggingComponent(null);
+      toast.success(`"${component.name}" añadido al proyecto`);
       return;
     }
 
-    const existingItem = projectItems.find((item) => item.componentId === componentId);
-    
-    let newItems: ProjectItemType[];
+    const existingItem = projectItems.find((item) => item.componentId === component.id);
+
     if (existingItem) {
-      toast.info(`\"${component.name}\" ya está en el proyecto`);
-      setDraggingComponent(null);
+      toast.info(`"${component.name}" ya está en el proyecto`);
       return;
-    } else {
-      const newItem: ProjectItemType = {
-        id: `${componentId}-${Date.now()}`,
-        componentId,
-        quantity: 1,
-        justification: ''
-      };
-      newItems = [...projectItems, newItem];
-      toast.success(`\"${component.name}\" añadido al proyecto`);
     }
 
+    const newItem: ProjectItemType = {
+      id: `${component.id}-${Date.now()}`,
+      componentId: component.id,
+      quantity: 1,
+      justification: ''
+    };
+    const newItems = [...projectItems, newItem];
     setProjectItems(newItems);
     addToHistory(newItems);
-    setDraggingComponent(null);
+    toast.success(`"${component.name}" añadido al proyecto`);
   };
 
   // Update item
@@ -384,58 +332,6 @@ export default function App() {
   const handleValidationError = (ids: string[]) => {
     setInvalidItemIds(ids);
     setTimeout(() => setInvalidItemIds([]), 5000);
-  };
-
-  // Handle touch drop on mobile
-  const handleTouchDrop = () => {
-    if (!draggingComponent || !isMobileDropActive) return;
-
-    const component = draggingComponent;
-
-    // Para componentes personalizados, siempre crear uno nuevo
-    if (component.id === 'custom-component') {
-      const newItem: ProjectItemType = {
-        id: `${component.id}-${Date.now()}`,
-        componentId: component.id,
-        quantity: 1,
-        justification: '',
-        customName: 'Componente personalizado'
-      };
-      const newItems = [...projectItems, newItem];
-      setProjectItems(newItems);
-      addToHistory(newItems);
-      toast.success(`\"${component.name}\" añadido al proyecto`);
-      setDraggingComponent(null);
-      setShowMobileDropArea(false);
-      setIsMobileDropActive(false);
-      return;
-    }
-
-    const existingItem = projectItems.find((item) => item.componentId === component.id);
-    
-    let newItems: ProjectItemType[];
-    if (existingItem) {
-      toast.info(`\"${component.name}\" ya está en el proyecto`);
-      setDraggingComponent(null);
-      setShowMobileDropArea(false);
-      setIsMobileDropActive(false);
-      return;
-    } else {
-      const newItem: ProjectItemType = {
-        id: `${component.id}-${Date.now()}`,
-        componentId: component.id,
-        quantity: 1,
-        justification: ''
-      };
-      newItems = [...projectItems, newItem];
-      toast.success(`\"${component.name}\" añadido al proyecto`);
-    }
-
-    setProjectItems(newItems);
-    addToHistory(newItems);
-    setDraggingComponent(null);
-    setShowMobileDropArea(false);
-    setIsMobileDropActive(false);
   };
 
   return (
@@ -543,7 +439,7 @@ export default function App() {
                 <h2>Componentes disponibles</h2>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                Arrastra para añadir a tu bandeja →
+                Arrastra para añadir a tu proyecto →
               </p>
               
               <ScrollArea className="h-[calc(100vh-320px)]">
@@ -648,7 +544,7 @@ export default function App() {
             <TabsContent value="components" className="mt-0">
               <div className="bg-surface rounded-lg shadow-sm p-4 dark:border dark:border-border">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Arrastra para añadir a tu bandeja
+                  Toca un componente para agregarlo a tu proyecto
                 </p>
                 <div className="space-y-3">
                   {categories.map((category) => {
@@ -662,6 +558,7 @@ export default function App() {
                         components={categoryComponents}
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
+                        onComponentClick={handleComponentClick}
                         wouldCauseNegative={() => false}
                         currentBudget={0}
                       />
@@ -748,19 +645,6 @@ export default function App() {
         open={showAboutDialog}
         onOpenChange={setShowAboutDialog}
       />
-      
-      {/* Mobile Drop Area */}
-      <div 
-        onDragOver={handleMobileDropAreaDragOver}
-        onDragLeave={handleMobileDropAreaDragLeave}
-      >
-        <MobileDropArea
-          isVisible={showMobileDropArea}
-          isActive={isMobileDropActive}
-          onDrop={handleMobileDropAreaDrop}
-          onTouchDrop={handleTouchDrop}
-        />
-      </div>
     </div>
   );
 }

@@ -3,37 +3,28 @@ import { ComponentCard } from './ComponentCard';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 import * as Icons from 'lucide-react';
 import { Badge } from './ui/badge';
-import { useState } from 'react';
 
 interface CategorySectionProps {
   category: Category;
   components: Component[];
   onDragStart: (component: Component) => void;
   onDragEnd: () => void;
+  onComponentClick?: (component: Component) => void;
   wouldCauseNegative: (points: number) => boolean;
   currentBudget: number;
 }
 
-export function CategorySection({ 
-  category, 
-  components, 
-  onDragStart, 
+export function CategorySection({
+  category,
+  components,
+  onDragStart,
   onDragEnd,
+  onComponentClick,
   wouldCauseNegative,
   currentBudget
 }: CategorySectionProps) {
   const IconComponent = Icons[category.icon as keyof typeof Icons] || Icons.Circle;
-  const [touchedComponent, setTouchedComponent] = useState<Component | null>(null);
-
-  const handleTouchStart = (component: Component) => {
-    setTouchedComponent(component);
-    onDragStart(component);
-  };
-
-  const handleTouchEnd = () => {
-    setTouchedComponent(null);
-    onDragEnd();
-  };
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
   return (
     <Accordion type="single" collapsible>
@@ -59,22 +50,28 @@ export function CategorySection({
             {components.map((component) => (
               <div
                 key={component.id}
-                draggable
+                draggable={!isMobile}
                 onDragStart={(e) => {
-                  e.dataTransfer.effectAllowed = 'copy';
-                  e.dataTransfer.setData('componentId', component.id);
-                  onDragStart(component);
+                  if (!isMobile) {
+                    e.dataTransfer.effectAllowed = 'copy';
+                    e.dataTransfer.setData('componentId', component.id);
+                    onDragStart(component);
+                  }
                 }}
                 onDragEnd={onDragEnd}
-                onTouchStart={() => handleTouchStart(component)}
-                onTouchEnd={handleTouchEnd}
+                onClick={() => {
+                  if (isMobile && onComponentClick) {
+                    onComponentClick(component);
+                  }
+                }}
+                className={isMobile ? 'cursor-pointer' : ''}
               >
                 <ComponentCard
                   component={component}
                   categoryColor={category.color}
                   wouldCauseNegative={wouldCauseNegative(component.basePoints)}
                   currentBudget={currentBudget}
-                  isDragging={touchedComponent?.id === component.id}
+                  isDragging={false}
                 />
               </div>
             ))}
