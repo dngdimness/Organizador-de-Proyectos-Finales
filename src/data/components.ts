@@ -65,7 +65,8 @@ export const components: Component[] = [
     description: 'Identidad visual completa y consistente', 
     basePoints: 0, 
     categoryId: 'identity-system', 
-    icon: 'Award' 
+    icon: 'Award',
+    exampleLink: 'https://www.perplexity.ai/search?q=Explicá%20el%20siguiente%20componente%20de%20diseño%3A%20sistema%20de%20identidad.%201.%20Definición%20clara%20y%20breve%20del%20componente.%202.%20En%20qué%20etapas%20de%20un%20proyecto%20se%20desarrolla.%203.%20Ejemplo%20principal%3A%20analizá%20el%20caso%20de%20Nike%2C%20explicando%20por%20qué%20es%20un%20buen%20caso.%204.%20Mencioná%20al%20menos%203%20ejemplos%20adicionales%20relevantes.%205.%20Usá%20lenguaje%20claro%20para%20estudiantes%20de%20diseño.'
   },
   { 
     id: 'dynamic-identity', 

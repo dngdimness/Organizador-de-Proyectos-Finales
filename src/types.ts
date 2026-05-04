@@ -5,6 +5,7 @@ export interface Component {
   basePoints: number;
   categoryId: string;
   icon: string;
+  exampleLink?: string;
 }
 
 export interface Category {

@@ -4,7 +4,8 @@ import { Card } from './ui/card';
 import * as Icons from 'lucide-react';
 import { getDiscountExamples } from '../utils/pricing';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
-import { Info, Percent } from 'lucide-react';
+import { Info, Percent, HelpCircle } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
 interface ComponentCardProps {
   component: Component;
@@ -21,9 +22,13 @@ export function ComponentCard({
   isDragging,
   currentBudget 
 }: ComponentCardProps) {
-  const IconComponent = Icons[component.icon as keyof typeof Icons] || Icons.Circle;
+  const IconComponent = (Icons[component.icon as keyof typeof Icons] || Icons.Circle) as LucideIcon;
   const [showInfo, setShowInfo] = useState(false);
   const [showDiscount, setShowDiscount] = useState(false);
+  const [showExamples, setShowExamples] = useState(false);
+  
+  // DEBUG
+  console.log('ComponentCard component:', component);
   
   return (
     <Card 
@@ -46,86 +51,113 @@ export function ComponentCard({
           <div className="flex items-start justify-between gap-2">
             <h3 className="truncate">{component.name}</h3>
             
-            {/* Hovers i y % */}
-            <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-              <TooltipProvider delayDuration={0}>
-                {/* Info tooltip */}
-                <Tooltip open={showInfo} onOpenChange={setShowInfo}>
-                  <TooltipTrigger asChild>
-                    <button
-                      className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
-                      aria-label="Ver información del componente"
-                      onFocus={() => setShowInfo(true)}
-                      onBlur={() => setShowInfo(false)}
-                    >
-                      <Info className="w-3.5 h-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-xs">
-                    <div className="space-y-1">
-                      <p className="font-medium">{component.name}</p>
-                      <p className="text-xs">{component.description}</p>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-
-                {/* Discount tooltip */}
-                <Tooltip open={showDiscount} onOpenChange={setShowDiscount}>
-                  <TooltipTrigger asChild>
-                    <button
-                      className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 flex items-center justify-center hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
-                      aria-label="Ver descuentos por repetición"
-                      onFocus={() => setShowDiscount(true)}
-                      onBlur={() => setShowDiscount(false)}
-                    >
-                      <Percent className="w-3.5 h-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-sm">
-                    <div className="space-y-2">
-                      <p className="font-medium">Descuentos por repetición</p>
-                      <div className="text-xs space-y-1">
-                        <div className="flex justify-between gap-4">
-                          <span>1ª copia:</span>
-                          <span className="font-medium">{component.basePoints} pts</span>
-                        </div>
-                        <div className="flex justify-between gap-4">
-                          <span>2ª copia (-20%):</span>
-                          <span className="font-medium">{Math.floor(component.basePoints * 0.8)} pts</span>
-                        </div>
-                        <div className="flex justify-between gap-4">
-                          <span>3ª copia (-30%):</span>
-                          <span className="font-medium">{Math.floor(component.basePoints * 0.7)} pts</span>
-                        </div>
-                        <div className="flex justify-between gap-4">
-                          <span>4ª copia (-40%):</span>
-                          <span className="font-medium">{Math.floor(component.basePoints * 0.6)} pts</span>
-                        </div>
-                        <div className="flex justify-between gap-4">
-                          <span>5+ copias (-50%):</span>
-                          <span className="font-medium">{Math.floor(component.basePoints * 0.5)} pts</span>
-                        </div>
+            {/* Botones: i, %, ? */}
+            <div className="flex items-center gap-1 shrink-0">
+              {/* Hovers i y % */}
+              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <TooltipProvider delayDuration={0}>
+                  {/* Info tooltip */}
+                  <Tooltip open={showInfo} onOpenChange={setShowInfo}>
+                    <TooltipTrigger asChild>
+                      <button
+                        className="w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-400"
+                        aria-label="Ver información del componente"
+                        onFocus={() => setShowInfo(true)}
+                        onBlur={() => setShowInfo(false)}
+                      >
+                        <Info className="w-3.5 h-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-xs">
+                      <div className="space-y-1">
+                        <p className="font-medium">{component.name}</p>
+                        <p className="text-xs">{component.description}</p>
                       </div>
-                      {currentBudget !== undefined && (
-                        <div className="pt-2 border-t border-border">
-                          <div className="flex justify-between text-xs">
-                            <span>Saldo actual:</span>
-                            <span className={currentBudget < 0 ? 'text-red-500 font-medium' : 'text-green-500 font-medium'}>
-                              {currentBudget} pts
-                            </span>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  {/* Discount tooltip */}
+                  <Tooltip open={showDiscount} onOpenChange={setShowDiscount}>
+                    <TooltipTrigger asChild>
+                      <button
+                        className="w-6 h-6 rounded-full bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-300 flex items-center justify-center hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-400"
+                        aria-label="Ver descuentos por repetición"
+                        onFocus={() => setShowDiscount(true)}
+                        onBlur={() => setShowDiscount(false)}
+                      >
+                        <Percent className="w-3.5 h-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="top" className="max-w-sm">
+                      <div className="space-y-2">
+                        <p className="font-medium">Descuentos por repetición</p>
+                        <div className="text-xs space-y-1">
+                          <div className="flex justify-between gap-4">
+                            <span>1ª copia:</span>
+                            <span className="font-medium">{component.basePoints} pts</span>
                           </div>
-                          <div className="flex justify-between text-xs mt-1">
-                            <span>Después de añadir:</span>
-                            <span className={currentBudget - component.basePoints < 0 ? 'text-red-500 font-medium' : 'text-green-500 font-medium'}>
-                              {currentBudget - component.basePoints} pts
-                            </span>
+                          <div className="flex justify-between gap-4">
+                            <span>2ª copia (-20%):</span>
+                            <span className="font-medium">{Math.floor(component.basePoints * 0.8)} pts</span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span>3ª copia (-30%):</span>
+                            <span className="font-medium">{Math.floor(component.basePoints * 0.7)} pts</span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span>4ª copia (-40%):</span>
+                            <span className="font-medium">{Math.floor(component.basePoints * 0.6)} pts</span>
+                          </div>
+                          <div className="flex justify-between gap-4">
+                            <span>5+ copias (-50%):</span>
+                            <span className="font-medium">{Math.floor(component.basePoints * 0.5)} pts</span>
                           </div>
                         </div>
-                      )}
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                        {currentBudget !== undefined && (
+                          <div className="pt-2 border-t border-border">
+                            <div className="flex justify-between text-xs">
+                              <span>Saldo actual:</span>
+                              <span className={currentBudget < 0 ? 'text-red-500 font-medium' : 'text-green-500 font-medium'}>
+                                {currentBudget} pts
+                              </span>
+                            </div>
+                            <div className="flex justify-between text-xs mt-1">
+                              <span>Después de añadir:</span>
+                              <span className={currentBudget - component.basePoints < 0 ? 'text-red-500 font-medium' : 'text-green-500 font-medium'}>
+                                {currentBudget - component.basePoints} pts
+                              </span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+
+              {/* Examples button - always visible */}
+              {component.exampleLink && (
+                <TooltipProvider delayDuration={0}>
+                  <Tooltip open={showExamples} onOpenChange={setShowExamples}>
+                    <TooltipTrigger asChild>
+                      <a
+                        href={component.exampleLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 flex items-center justify-center hover:bg-green-200 dark:hover:bg-green-800 transition-colors focus:outline-none focus:ring-2 focus:ring-green-400"
+                        aria-label="Ver ejemplos en Perplexity"
+                        onFocus={() => setShowExamples(true)}
+                        onBlur={() => setShowExamples(false)}
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </a>
+                    </TooltipTrigger>
+                    <TooltipContent side="top">
+                      <p className="text-xs">Ver ejemplos en Perplexity</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
             </div>
           </div>
         </div>
